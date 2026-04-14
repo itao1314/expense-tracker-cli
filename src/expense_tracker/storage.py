@@ -111,6 +111,14 @@ class ExpenseStore:
     def all_expenses(self) -> list[Expense]:
         return self.list_expenses(limit=None)
 
+    def delete_expense(self, expense_id: int) -> bool:
+        cursor = self.connection.execute(
+            "DELETE FROM expenses WHERE id = ?",
+            (expense_id,),
+        )
+        self.connection.commit()
+        return cursor.rowcount > 0
+
     def monthly_totals(self) -> list[sqlite3.Row]:
         return self.connection.execute(
             """

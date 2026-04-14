@@ -187,6 +187,24 @@ def export(
     console.print(f"Exported {len(expenses)} expenses to [bold]{output_path}[/bold].")
 
 
+@app.command()
+def delete(
+    expense_id: int = typer.Argument(..., help="Expense ID to delete."),
+) -> None:
+    """Delete an expense by ID."""
+    store = get_store()
+    try:
+        deleted = store.delete_expense(expense_id)
+    finally:
+        store.close()
+
+    if not deleted:
+        console.print(f"Expense with ID {expense_id} was not found.", style="yellow")
+        raise typer.Exit(code=1)
+
+    console.print(f"Deleted expense [bold]#{expense_id}[/bold].", style="green")
+
+
 def main() -> None:
     app()
 

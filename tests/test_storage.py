@@ -51,6 +51,20 @@ class StorageTests(unittest.TestCase):
 
         self.assertEqual(len(expenses), 2)
 
+    def test_delete_expense_removes_matching_record(self) -> None:
+        expense = self.store.add_expense(Decimal("10.00"), "coffee", "food")
+
+        deleted = self.store.delete_expense(expense.id)
+        expenses = self.store.all_expenses()
+
+        self.assertTrue(deleted)
+        self.assertEqual(expenses, [])
+
+    def test_delete_expense_returns_false_for_missing_id(self) -> None:
+        deleted = self.store.delete_expense(999)
+
+        self.assertFalse(deleted)
+
 
 if __name__ == "__main__":
     unittest.main()

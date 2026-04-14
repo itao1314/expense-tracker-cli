@@ -8,6 +8,7 @@ A small terminal-first expense tracker for developers who want to log spending q
 - `expense list`
 - `expense report`
 - `expense export expenses.csv`
+- `expense delete 3`
 - Local SQLite storage with automatic setup
 
 ## Install
@@ -43,6 +44,12 @@ Export expenses:
 
 ```bash
 expense export expenses.csv
+```
+
+Delete an expense:
+
+```bash
+expense delete 3
 ```
 
 ## Storage
