@@ -13,6 +13,9 @@ dependencies = [
   "rich>=13.7,<14.0",
 ]
 
+[project.scripts]
+expense = "expense_tracker.cli:app"
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 

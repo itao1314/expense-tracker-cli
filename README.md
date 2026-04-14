@@ -2,10 +2,40 @@
 
 A small terminal-first expense tracker for developers who want to log spending quickly.
 
+## Features
+
+- `expense add 50 lunch`
+- `expense list`
+- `expense report`
+- Local SQLite storage with automatic setup
+
 ## Install
 
 ```bash
 python3 -m pip install .
+```
+
+## Usage
+
+Add an expense:
+
+```bash
+expense add 50 lunch
+expense add 12.50 coffee beans --category groceries
+```
+
+List expenses:
+
+```bash
+expense list
+expense list --limit 10
+```
+
+Show a report:
+
+```bash
+expense report
+expense report --month 2026-04
 ```
 
 ## Storage
