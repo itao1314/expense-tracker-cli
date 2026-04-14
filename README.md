@@ -41,6 +41,8 @@ expense report
 expense report --month 2026-04
 ```
 
+`expense report` now includes an overall category totals section, with categories sorted by total spend descending.
+
 Export expenses:
 
 ```bash

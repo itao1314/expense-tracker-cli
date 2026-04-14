@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
@@ -114,6 +115,7 @@ def report(
     try:
         monthly_rows = store.monthly_totals()
         category_rows = store.monthly_category_totals(month=month)
+        category_totals = store.category_totals(month=month)
     finally:
         store.close()
 
@@ -134,13 +136,30 @@ def report(
             totals_table.add_row(row["month"], money(total), "█" * width)
         console.print(totals_table)
 
-    grouped: dict[str, list[tuple[str, float]]] = {}
+    grouped: dict[str, list[tuple[str, float]]] = defaultdict(list)
     for row in category_rows:
-        grouped.setdefault(row["month"], []).append((row["category"], float(row["total"])))
+        grouped[row["month"]].append((row["category"], float(row["total"])))
 
     if month and month not in grouped:
         console.print(f"No expenses found for {month}.")
         raise typer.Exit(code=1)
+
+    summary_title = "Category Totals"
+    if month:
+        summary_title = f"Category Totals · {month}"
+
+    summary_table = Table(title=summary_title)
+    summary_table.add_column("Category", style="magenta")
+    summary_table.add_column("Total", justify="right", style="green")
+    summary_table.add_column("Share", style="yellow")
+
+    overall_total = sum(float(row["total"]) for row in category_totals) or 1.0
+    for row in category_totals:
+        total = float(row["total"])
+        width = max(1, round((total / overall_total) * 30))
+        summary_table.add_row(row["category"], money(total), "■" * width)
+
+    console.print(summary_table)
 
     for group_month, items in grouped.items():
         category_table = Table(title=f"Category Breakdown · {group_month}")

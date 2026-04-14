@@ -83,6 +83,27 @@ class DeleteCommandTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 1)
         self.assertIn("Expense with ID 999 was not found.", result.stdout)
 
+    def test_report_command_includes_category_totals_sorted_descending(self) -> None:
+        store = ExpenseStore(db_path=self.db_path)
+        store.add_expense(amount=Decimal("5.00"), description="coffee", category="food")
+        store.add_expense(amount=Decimal("30.00"), description="groceries", category="shopping")
+        store.add_expense(amount=Decimal("15.00"), description="lunch", category="food")
+        store.close()
+
+        result = self.runner.invoke(app, ["report"])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("Category Totals", result.stdout)
+        self.assertIn("shopping", result.stdout)
+        self.assertIn("food", result.stdout)
+        self.assertLess(result.stdout.index("shopping"), result.stdout.index("food"))
+
+    def test_report_command_handles_empty_database_gracefully(self) -> None:
+        result = self.runner.invoke(app, ["report"])
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("No expenses saved yet. Add one before running reports.", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

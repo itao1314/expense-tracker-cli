@@ -89,6 +89,17 @@ class StorageTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.store.update_expense(1)
 
+    def test_category_totals_sorted_by_total_descending(self) -> None:
+        self.store.add_expense(Decimal("10.00"), "coffee", "food")
+        self.store.add_expense(Decimal("25.00"), "groceries", "shopping")
+        self.store.add_expense(Decimal("5.00"), "snack", "food")
+
+        totals = self.store.category_totals()
+
+        self.assertEqual([row["category"] for row in totals], ["shopping", "food"])
+        self.assertEqual(round(totals[0]["total"], 2), 25.0)
+        self.assertEqual(round(totals[1]["total"], 2), 15.0)
+
 
 if __name__ == "__main__":
     unittest.main()

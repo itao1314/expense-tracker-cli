@@ -177,5 +177,21 @@ class ExpenseStore:
         """
         return self.connection.execute(query, params).fetchall()
 
+    def category_totals(self, month: str | None = None) -> list[sqlite3.Row]:
+        query = """
+            SELECT category, SUM(CAST(amount AS REAL)) AS total
+            FROM expenses
+        """
+        params: tuple[str, ...] = ()
+        if month:
+            query += " WHERE substr(created_at, 1, 7) = ?"
+            params = (month,)
+
+        query += """
+            GROUP BY category
+            ORDER BY total DESC, category ASC
+        """
+        return self.connection.execute(query, params).fetchall()
+
     def close(self) -> None:
         self.connection.close()
