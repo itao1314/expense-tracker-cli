@@ -111,6 +111,26 @@ class ExpenseStore:
     def all_expenses(self) -> list[Expense]:
         return self.list_expenses(limit=None)
 
+    def get_expense(self, expense_id: int) -> Expense | None:
+        row = self.connection.execute(
+            """
+            SELECT id, amount, description, category, created_at
+            FROM expenses
+            WHERE id = ?
+            """,
+            (expense_id,),
+        ).fetchone()
+        if row is None:
+            return None
+
+        return Expense(
+            id=row["id"],
+            amount=Decimal(row["amount"]),
+            description=row["description"],
+            category=row["category"],
+            created_at=row["created_at"],
+        )
+
     def delete_expense(self, expense_id: int) -> bool:
         cursor = self.connection.execute(
             "DELETE FROM expenses WHERE id = ?",

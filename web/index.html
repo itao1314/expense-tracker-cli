@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f1e8;
+        --surface: #fffdf8;
+        --surface-alt: #f0e7d6;
+        --text: #1f2933;
+        --muted: #6b7280;
+        --accent: #1f6f78;
+        --accent-strong: #124f57;
+        --danger: #b94a48;
+        --border: #d9cfbf;
+        --shadow: 0 20px 40px rgba(61, 52, 39, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(31, 111, 120, 0.14), transparent 32%),
+          linear-gradient(180deg, #f9f5ed 0%, var(--bg) 100%);
+      }
+
+      main {
+        width: min(1080px, calc(100% - 2rem));
+        margin: 2rem auto 3rem;
+      }
+
+      .hero {
+        display: grid;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3.75rem);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 44rem;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .layout {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: 320px 1fr;
+      }
+
+      .panel {
+        background: rgba(255, 253, 248, 0.92);
+        backdrop-filter: blur(6px);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        padding: 1.2rem;
+      }
+
+      .panel h2,
+      .panel h3 {
+        margin-top: 0;
+        margin-bottom: 0.85rem;
+      }
+
+      form {
+        display: grid;
+        gap: 0.8rem;
+      }
+
+      label {
+        display: grid;
+        gap: 0.35rem;
+        font-size: 0.95rem;
+      }
+
+      input,
+      button {
+        font: inherit;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.8rem 0.9rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #fff;
+      }
+
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 0.8rem 1rem;
+        cursor: pointer;
+        transition: transform 120ms ease, opacity 120ms ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      .primary {
+        color: #fff;
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      }
+
+      .danger {
+        color: #fff;
+        background: var(--danger);
+      }
+
+      .subtle {
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.8rem;
+      }
+
+      .metric {
+        padding: 0.9rem;
+        border-radius: 16px;
+        background: var(--surface-alt);
+      }
+
+      .metric .label {
+        display: block;
+        color: var(--muted);
+        font-size: 0.85rem;
+        margin-bottom: 0.35rem;
+      }
+
+      .metric .value {
+        font-size: 1.4rem;
+        font-weight: 700;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 0.85rem 0.4rem;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 0.88rem;
+        font-weight: 600;
+      }
+
+      td:last-child,
+      th:last-child {
+        text-align: right;
+      }
+
+      .row-actions button {
+        padding: 0.55rem 0.8rem;
+        font-size: 0.9rem;
+      }
+
+      .empty {
+        color: var(--muted);
+        padding: 1rem 0;
+      }
+
+      #status {
+        min-height: 1.25rem;
+        color: var(--accent-strong);
+      }
+
+      @media (max-width: 860px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        main {
+          width: min(100% - 1rem, 1080px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div>
+          <p class="subtle">Expense Tracker</p>
+          <h1>Keep daily spending visible.</h1>
+        </div>
+        <p>
+          A minimal browser UI for the existing API. Add expenses, review recent entries,
+          delete mistakes, and scan your current report summary from one page.
+        </p>
+      </section>
+
+      <section class="layout">
+        <aside class="panel">
+          <h2>Add Expense</h2>
+          <form id="expense-form">
+            <label>
+              Amount
+              <input id="amount" name="amount" type="number" min="0.01" step="0.01" placeholder="12.50" required />
+            </label>
+            <label>
+              Description
+              <input id="description" name="description" type="text" placeholder="Coffee beans" required />
+            </label>
+            <label>
+              Category
+              <input id="category" name="category" type="text" placeholder="groceries" value="uncategorized" required />
+            </label>
+            <button class="primary" type="submit">Save Expense</button>
+          </form>
+          <p id="status" class="subtle" aria-live="polite"></p>
+        </aside>
+
+        <div class="panel">
+          <h2>Report Summary</h2>
+          <div id="report-summary" class="summary-grid"></div>
+          <div id="report-breakdown"></div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top: 1rem">
+        <h2>Recent Expenses</h2>
+        <div id="expense-table"></div>
+      </section>
+    </main>
+
+    <script>
+      const statusEl = document.getElementById("status");
+      const formEl = document.getElementById("expense-form");
+      const expenseTableEl = document.getElementById("expense-table");
+      const reportSummaryEl = document.getElementById("report-summary");
+      const reportBreakdownEl = document.getElementById("report-breakdown");
+
+      function money(value) {
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(Number(value));
+      }
+
+      function setStatus(message, isError = false) {
+        statusEl.textContent = message;
+        statusEl.style.color = isError ? "#b94a48" : "#124f57";
+      }
+
+      async function api(path, options = {}) {
+        const response = await fetch(path, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+
+        if (response.status === 204) {
+          return null;
+        }
+
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload.detail || "Request failed.");
+        }
+        return payload;
+      }
+
+      function renderExpenses(expenses) {
+        if (!expenses.length) {
+          expenseTableEl.innerHTML = '<p class="empty">No expenses saved yet.</p>';
+          return;
+        }
+
+        expenseTableEl.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${expenses
+                .map(
+                  (expense) => `
+                    <tr>
+                      <td>${expense.id}</td>
+                      <td>${expense.created_at.replace("T", " ")}</td>
+                      <td>${expense.description}</td>
+                      <td>${expense.category}</td>
+                      <td>${money(expense.amount)}</td>
+                      <td class="row-actions">
+                        <button class="danger" data-expense-id="${expense.id}" type="button">Delete</button>
+                      </td>
+                    </tr>
+                  `,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      function renderReport(report) {
+        const monthCount = report.monthly_totals.length;
+        const expenseMonths = monthCount ? report.monthly_totals.map((item) => item.month) : [];
+        const totalSpend = report.category_totals.reduce((sum, item) => sum + Number(item.total), 0);
+        const topCategory = report.category_totals[0]?.category || "none";
+
+        reportSummaryEl.innerHTML = `
+          <div class="metric">
+            <span class="label">Tracked months</span>
+            <span class="value">${monthCount}</span>
+          </div>
+          <div class="metric">
+            <span class="label">Total spend</span>
+            <span class="value">${money(totalSpend)}</span>
+          </div>
+          <div class="metric">
+            <span class="label">Top category</span>
+            <span class="value">${topCategory}</span>
+          </div>
+          <div class="metric">
+            <span class="label">Latest month</span>
+            <span class="value">${expenseMonths[0] || "n/a"}</span>
+          </div>
+        `;
+
+        if (!report.category_totals.length) {
+          reportBreakdownEl.innerHTML = '<p class="empty">No report data yet.</p>';
+          return;
+        }
+
+        reportBreakdownEl.innerHTML = `
+          <h3>Category Totals</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${report.category_totals
+                .map(
+                  (row) => `
+                    <tr>
+                      <td>${row.category}</td>
+                      <td>${money(row.total)}</td>
+                    </tr>
+                  `,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      async function refresh() {
+        const [expenses, report] = await Promise.all([api("/expenses"), api("/report")]);
+        renderExpenses(expenses);
+        renderReport(report);
+      }
+
+      formEl.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        setStatus("Saving...");
+
+        const formData = new FormData(formEl);
+        const payload = {
+          amount: formData.get("amount"),
+          description: formData.get("description"),
+          category: formData.get("category"),
+        };
+
+        try {
+          await api("/expenses", {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+          formEl.reset();
+          document.getElementById("category").value = "uncategorized";
+          setStatus("Expense saved.");
+          await refresh();
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      });
+
+      expenseTableEl.addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-expense-id]");
+        if (!button) {
+          return;
+        }
+
+        const expenseId = button.getAttribute("data-expense-id");
+        try {
+          await api(`/expenses/${expenseId}`, { method: "DELETE" });
+          setStatus(`Deleted expense #${expenseId}.`);
+          await refresh();
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      });
+
+      refresh().catch((error) => {
+        setStatus(error.message, true);
+      });
+    </script>
+  </body>
+</html>

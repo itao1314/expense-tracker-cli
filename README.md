@@ -24,6 +24,12 @@ Install build tooling:
 python3 -m pip install ".[build]"
 ```
 
+Install API tooling:
+
+```bash
+python3 -m pip install ".[api]"
+```
+
 ## Usage
 
 Add an expense:
@@ -66,6 +72,52 @@ Edit an expense:
 ```bash
 expense edit 3 --amount 24 --description dinner --category food
 expense edit 3 --category groceries
+```
+
+## API Server
+
+Run the FastAPI server with:
+
+```bash
+python3 -m uvicorn expense_tracker.api:app --reload
+```
+
+If you are running from source without installing the package first, include `src` on `PYTHONPATH`:
+
+```bash
+PYTHONPATH=src python3 -m uvicorn expense_tracker.api:app --reload
+```
+
+Available endpoints:
+
+- `GET /expenses`
+- `POST /expenses`
+- `DELETE /expenses/{id}`
+- `PATCH /expenses/{id}`
+- `GET /report`
+
+## Docker
+
+Build the container image:
+
+```bash
+docker build -t expense-tracker-api .
+```
+
+Run the FastAPI app on port `8000`:
+
+```bash
+docker run --rm -p 8000:8000 expense-tracker-api
+```
+
+If you want the database to persist outside the container, mount a host path and point `EXPENSE_DB_PATH` at it:
+
+```bash
+docker run --rm \
+  -p 8000:8000 \
+  -e EXPENSE_DB_PATH=/data/expenses.db \
+  -v "$(pwd)/.data:/data" \
+  expense-tracker-api
 ```
 
 ## Storage
