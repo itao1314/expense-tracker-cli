@@ -205,6 +205,56 @@ def delete(
     console.print(f"Deleted expense [bold]#{expense_id}[/bold].", style="green")
 
 
+@app.command()
+def edit(
+    expense_id: int = typer.Argument(..., help="Expense ID to edit."),
+    amount: str | None = typer.Option(None, "--amount", help="Updated expense amount."),
+    description: str | None = typer.Option(None, "--description", help="Updated expense description."),
+    category: str | None = typer.Option(None, "--category", "-c", help="Updated expense category."),
+) -> None:
+    """Edit an expense by ID."""
+    parsed_amount: Decimal | None = None
+    normalized_description: str | None = None
+    normalized_category: str | None = None
+
+    if amount is not None:
+        try:
+            parsed_amount = normalize_amount(amount)
+        except ValueError as exc:
+            raise typer.BadParameter(str(exc), param_hint="--amount") from exc
+
+    if description is not None:
+        normalized_description = description.strip()
+        if not normalized_description:
+            raise typer.BadParameter("Description cannot be empty.", param_hint="--description")
+
+    if category is not None:
+        normalized_category = category.strip().lower()
+        if not normalized_category:
+            raise typer.BadParameter("Category cannot be empty.", param_hint="--category")
+
+    if parsed_amount is None and normalized_description is None and normalized_category is None:
+        console.print("Provide at least one field to update: --amount, --description, or --category.", style="yellow")
+        raise typer.Exit(code=1)
+
+    store = get_store()
+    try:
+        updated = store.update_expense(
+            expense_id,
+            amount=parsed_amount,
+            description=normalized_description,
+            category=normalized_category,
+        )
+    finally:
+        store.close()
+
+    if not updated:
+        console.print(f"Expense with ID {expense_id} was not found.", style="yellow")
+        raise typer.Exit(code=1)
+
+    console.print(f"Updated expense [bold]#{expense_id}[/bold].", style="green")
+
+
 def main() -> None:
     app()
 

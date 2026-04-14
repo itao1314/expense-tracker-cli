@@ -49,6 +49,40 @@ class DeleteCommandTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 1)
         self.assertIn("Expense with ID 999 was not found.", result.stdout)
 
+    def test_edit_command_updates_only_provided_fields(self) -> None:
+        store = ExpenseStore(db_path=self.db_path)
+        expense = store.add_expense(amount=Decimal("10.00"), description="coffee", category="food")
+        store.close()
+
+        result = self.runner.invoke(
+            app,
+            ["edit", str(expense.id), "--amount", "12.75", "--category", "groceries"],
+        )
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn(f"Updated expense #{expense.id}.", result.stdout)
+
+        store = ExpenseStore(db_path=self.db_path)
+        try:
+            expenses = store.all_expenses()
+            self.assertEqual(expenses[0].amount, Decimal("12.75"))
+            self.assertEqual(expenses[0].description, "coffee")
+            self.assertEqual(expenses[0].category, "groceries")
+        finally:
+            store.close()
+
+    def test_edit_command_requires_at_least_one_field(self) -> None:
+        result = self.runner.invoke(app, ["edit", "1"])
+
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Provide at least one field to update", result.stdout)
+
+    def test_edit_command_shows_friendly_error_for_missing_id(self) -> None:
+        result = self.runner.invoke(app, ["edit", "999", "--description", "tea"])
+
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Expense with ID 999 was not found.", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

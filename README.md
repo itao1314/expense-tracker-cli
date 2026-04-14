@@ -9,6 +9,7 @@ A small terminal-first expense tracker for developers who want to log spending q
 - `expense report`
 - `expense export expenses.csv`
 - `expense delete 3`
+- `expense edit 3 --amount 24 --description dinner --category food`
 - Local SQLite storage with automatic setup
 
 ## Install
@@ -50,6 +51,13 @@ Delete an expense:
 
 ```bash
 expense delete 3
+```
+
+Edit an expense:
+
+```bash
+expense edit 3 --amount 24 --description dinner --category food
+expense edit 3 --category groceries
 ```
 
 ## Storage

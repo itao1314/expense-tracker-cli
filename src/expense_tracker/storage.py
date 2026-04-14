@@ -119,6 +119,38 @@ class ExpenseStore:
         self.connection.commit()
         return cursor.rowcount > 0
 
+    def update_expense(
+        self,
+        expense_id: int,
+        *,
+        amount: Decimal | None = None,
+        description: str | None = None,
+        category: str | None = None,
+    ) -> bool:
+        fields: list[str] = []
+        values: list[str | int] = []
+
+        if amount is not None:
+            fields.append("amount = ?")
+            values.append(str(amount))
+        if description is not None:
+            fields.append("description = ?")
+            values.append(description)
+        if category is not None:
+            fields.append("category = ?")
+            values.append(category)
+
+        if not fields:
+            raise ValueError("At least one field must be provided.")
+
+        values.append(expense_id)
+        cursor = self.connection.execute(
+            f"UPDATE expenses SET {', '.join(fields)} WHERE id = ?",
+            values,
+        )
+        self.connection.commit()
+        return cursor.rowcount > 0
+
     def monthly_totals(self) -> list[sqlite3.Row]:
         return self.connection.execute(
             """

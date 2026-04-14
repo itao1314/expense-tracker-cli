@@ -65,6 +65,30 @@ class StorageTests(unittest.TestCase):
 
         self.assertFalse(deleted)
 
+    def test_update_expense_changes_only_provided_fields(self) -> None:
+        expense = self.store.add_expense(Decimal("10.00"), "coffee", "food")
+
+        updated = self.store.update_expense(
+            expense.id,
+            amount=Decimal("15.50"),
+            category="groceries",
+        )
+        expenses = self.store.all_expenses()
+
+        self.assertTrue(updated)
+        self.assertEqual(expenses[0].amount, Decimal("15.50"))
+        self.assertEqual(expenses[0].description, "coffee")
+        self.assertEqual(expenses[0].category, "groceries")
+
+    def test_update_expense_returns_false_for_missing_id(self) -> None:
+        updated = self.store.update_expense(999, description="tea")
+
+        self.assertFalse(updated)
+
+    def test_update_expense_requires_at_least_one_field(self) -> None:
+        with self.assertRaises(ValueError):
+            self.store.update_expense(1)
+
 
 if __name__ == "__main__":
     unittest.main()
