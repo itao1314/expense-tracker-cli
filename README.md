@@ -7,6 +7,7 @@ A small terminal-first expense tracker for developers who want to log spending q
 - `expense add 50 lunch`
 - `expense list`
 - `expense report`
+- `expense export expenses.csv`
 - Local SQLite storage with automatic setup
 
 ## Install
@@ -36,6 +37,12 @@ Show a report:
 ```bash
 expense report
 expense report --month 2026-04
+```
+
+Export expenses:
+
+```bash
+expense export expenses.csv
 ```
 
 ## Storage

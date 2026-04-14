@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import csv
 from datetime import datetime
 from decimal import Decimal
+from pathlib import Path
 
 import typer
 from rich.console import Console
@@ -152,6 +154,37 @@ def report(
             category_table.add_row(category, money(total), "■" * width)
 
         console.print(category_table)
+
+
+@app.command()
+def export(
+    output_path: Path = typer.Argument(..., help="Destination CSV file path."),
+) -> None:
+    """Export all expenses to a CSV file."""
+    output_path = output_path.expanduser()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    store = get_store()
+    try:
+        expenses = store.all_expenses()
+    finally:
+        store.close()
+
+    with output_path.open("w", newline="", encoding="utf-8") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["id", "amount", "description", "category", "date"])
+        for expense in expenses:
+            writer.writerow(
+                [
+                    expense.id,
+                    f"{expense.amount:.2f}",
+                    expense.description,
+                    expense.category,
+                    expense.created_at,
+                ]
+            )
+
+    console.print(f"Exported {len(expenses)} expenses to [bold]{output_path}[/bold].")
 
 
 def main() -> None:
