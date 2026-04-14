@@ -1,0 +1,5 @@
+typer<1.0,>=0.12
+rich<14.0,>=13.7
+
+[build]
+pyinstaller<7,>=6

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import runpy
 import tempfile
 import unittest
 from decimal import Decimal
@@ -103,6 +104,11 @@ class DeleteCommandTests(unittest.TestCase):
 
         self.assertEqual(result.exit_code, 0)
         self.assertIn("No expenses saved yet. Add one before running reports.", result.stdout)
+
+    def test_packaged_entrypoint_runs_as_top_level_script(self) -> None:
+        module_globals = runpy.run_path(str(Path(__file__).resolve().parents[1] / "src" / "expense.py"))
+
+        self.assertIn("main", module_globals)
 
 
 if __name__ == "__main__":

@@ -18,6 +18,12 @@ A small terminal-first expense tracker for developers who want to log spending q
 python3 -m pip install .
 ```
 
+Install build tooling:
+
+```bash
+python3 -m pip install ".[build]"
+```
+
 ## Usage
 
 Add an expense:
@@ -74,4 +80,25 @@ Override the location with:
 
 ```bash
 export EXPENSE_DB_PATH=/path/to/expenses.db
+```
+
+## Build Executable
+
+Build a single-file binary with PyInstaller:
+
+```bash
+make build
+```
+
+The binary will be written to:
+
+```bash
+dist/expense
+```
+
+If you want to rebuild from a clean state:
+
+```bash
+make clean
+make build
 ```
